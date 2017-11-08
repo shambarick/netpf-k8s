@@ -1,0 +1,84 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: procedure
+  namespace: netpf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: procedure
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: procedure
+        type: api
+        tier: backend
+    spec:
+      containers:
+      - name: procedure
+        image: sipf/procedure-ws:latest
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: jdbc:postgresql://procedure-db/procedure
+          - name: SPRING_DATASOURCE_USERNAME
+            value: procedure
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: procedure
+          - name: SPRING_PROFILES_ACTIVE
+            value: test
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: procedure-db
+  namespace: netpf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: procedure
+      tier: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: procedure
+        type: database
+        tier: postgres
+    spec:
+      containers:
+      - name: database
+        image: postgres:9.5
+        env:
+          - name: POSTGRES_DB
+            value: procedure
+          - name: POSTGRES_USER
+            value: procedure
+          - name: POSTGRES_PASSWORD
+            value: procedure
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 5432

@@ -1,0 +1,31 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: zipcode-ws
+  namespace: netpf
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        app: zipcode
+        type: api
+        tier: backend
+    spec:
+      containers:
+      - name: zipcode
+        image: sipf/zipcode-ws:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 30

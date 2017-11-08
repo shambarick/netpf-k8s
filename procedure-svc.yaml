@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: procedure-ws
+  namespace: netpf
+  labels:
+    app: procedure
+    tier: backend
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: procedure
+    tier: backend
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: procedure-db
+  namespace: netpf
+  labels:
+    app: procedure
+    tier: postgres
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: procedure
+    tier: postgres
+  clusterIP: None

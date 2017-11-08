@@ -1,0 +1,104 @@
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: zipcode-db-pv-claim
+#  labels:
+#    app: zipcode
+#spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 500Mi
+#---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: organism
+  namespace: netpf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: organism
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: organism
+        type: api
+        tier: backend
+    spec:
+      containers:
+      - name: organism
+        image: sipf/organism-ws:latest
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: jdbc:postgresql://organism-db/organism
+          - name: SPRING_DATASOURCE_USERNAME
+            value: organism
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: organism
+          - name: SPRING_PROFILES_ACTIVE
+            value: test
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: organism-db
+  namespace: netpf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: organism
+      tier: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: organism
+        type: database
+        tier: postgres
+    spec:
+      containers:
+      - name: database
+        image: postgres:9.5
+        env:
+          - name: POSTGRES_DB
+            value: organism
+          - name: POSTGRES_USER
+            value: organism
+          - name: POSTGRES_PASSWORD
+            value: organism
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 5432
+#        volumeMounts:
+#        - name: zipcode-db-persistent-storage
+#          mountPath: /var/www/html
+#      volumes:
+#      - name: zipcode-db-persistent-storage
+#        persistentVolumeClaim:
+#          claimName: organism-db-local-pv

@@ -1,0 +1,84 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: news
+  namespace: netpf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: news
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: news
+        type: api
+        tier: backend
+    spec:
+      containers:
+      - name: news
+        image: sipf/news-ws:latest
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: jdbc:postgresql://news-db/news
+          - name: SPRING_DATASOURCE_USERNAME
+            value: news
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: news
+          - name: SPRING_PROFILES_ACTIVE
+            value: test
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: news-db
+  namespace: netpf
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: news
+      tier: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: news
+        type: database
+        tier: postgres
+    spec:
+      containers:
+      - name: database
+        image: postgres:9.5
+        env:
+          - name: POSTGRES_DB
+            value: news
+          - name: POSTGRES_USER
+            value: news
+          - name: POSTGRES_PASSWORD
+            value: news
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 5432

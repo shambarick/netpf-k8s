@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: organism-ws
+  namespace: netpf
+  labels:
+    app: organism
+    tier: backend
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: organism
+    tier: backend
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: organism-db
+  namespace: netpf
+  labels:
+    app: organism
+    tier: postgres
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: organism
+    tier: postgres
+  clusterIP: None

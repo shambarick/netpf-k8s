@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: organism-db-local-pv
+  annotations:
+    "volume.alpha.kubernetes.io/node-affinity": '{
+      "requiredDuringSchedulingIgnoredDuringExecution": {
+        "nodeSelectorTerms": [
+          { "matchExpressions": [
+            { "key": "db",
+              "operator": "In",
+              "values": ["true"]
+            }
+          ]}
+         ]}
+        }'
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/organism-db

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipcode-ws
+  namespace: netpf
+  labels:
+    app: zipcode
+    tier: backend
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: zipcode
+    tier: backend
+  type: LoadBalancer
