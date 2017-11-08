@@ -40,8 +40,11 @@ spec:
         livenessProbe:
           httpGet:
             scheme: HTTP
-            path: /
+            path: /health
             port: 8080
+            httpHeaders:
+            - name: Authorization
+              value: Basic YWRtaW46cGFzc3dvcmQ=
           initialDelaySeconds: 30
           timeoutSeconds: 30
 ---
