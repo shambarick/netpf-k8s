@@ -4,6 +4,13 @@ Create the `netpf` namespace
 kubectl create namespace netpf
 ```
 
+Deploy discovery
+
+```
+curl -L -s https://github.com/shambarick/netpf-k8s/raw/master/discovery-deployment.yaml | kubectl apply -f -
+curl -L -s https://github.com/shambarick/netpf-k8s/raw/master/discovery-svc.yaml | kubectl apply -f -
+```
+
 Deploy zipcode
 
 ```
