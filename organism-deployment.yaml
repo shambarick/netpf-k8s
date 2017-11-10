@@ -44,6 +44,8 @@ spec:
             value: organism
           - name: SPRING_PROFILES_ACTIVE
             value: test
+          - name: SPRING_APPLICATION_JSON
+            value: '{"eureka": { "client": { "serviceUrl": { "defaultZone": "http://discovery:8761/eureka/" }}}}'
         resources:
           requests:
             cpu: 100m
